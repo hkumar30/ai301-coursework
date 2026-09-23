@@ -137,7 +137,8 @@ touches core internals, it's a usage/support question rather than a concrete cha
 the thread shows 2 or more distinct people having claimed and then been
 auto-unassigned/gone silent, and/or 2 or more closed-unmerged PR attempts on the same
 issue (real difficulty beyond its apparent scope). A checklist of concrete steps or
-files within ONE cohesive change is not an umbrella issue by itself, pass it."
+files within ONE cohesive change is not an umbrella issue by itself — pass it. Otherwise
+pass, regardless of how terse the writeup is"
 
 I wrote it this way because one stale claim comment or one abandoned pull request is
 normal, and it should not sink an otherwise good issue. A pattern of repeated attempts
