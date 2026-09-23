@@ -34,11 +34,18 @@ will fail eval issues designed around that family.
 
 | Check | Evidence | Pass condition | Weight |
 |---|---|---|---|
-|  |  |  |  |
+| Maintainer alive | Last 5 default-branch commit dates/authors, and the maintainer first-response sample | Pass if either signal shows life: at least one of the last 5 default-branch commits is dated within 90 days of the capture date (live mode: today), OR an Owner/Member/Collaborator reply lands within 30 days on any sampled issue. Fail only if both signals are stale | required |
+| Active repo | Latest release date, last push, archived flag | A release or push happened in the last 90 days, and the repo isn't archived | required |
+| AI-contribution policy | CONTRIBUTING.md / AI policy line | Fails only if AI-generated contributions are outright banned. Rules/conditions are fine. No policy mentioned = fine. | required |
+| Scope fits a newcomer | Issue body, full comment thread, and linked-PR history | Fail if the issue explicitly proposes breaking the work into multiple separate issues/PRs, the thread shows active unresolved design debate, a maintainer says the fix touches core internals, it's a usage/support question rather than a concrete change, or the thread shows 2 or more distinct people having claimed and then been auto-unassigned/gone silent, and/or 2 or more closed-unmerged PR attempts on the same issue (real difficulty beyond its apparent scope). A checklist of concrete steps or files within ONE cohesive change is not an umbrella issue by itself — pass it. Otherwise pass, regardless of how terse the writeup is | required |
+| Nobody already on it | Assignees box; linked PRs (Development box + PRs mentioned in thread); claim comments in thread, with dates | Fail if an assignee is set, an open PR addressing the issue is linked/mentioned, or someone claimed it within the last 14 days with no sign of abandonment. A closed/unmerged PR or a stale (14+ day, no follow-up) claim does not fail this check | required |
 
 ## Verdict rule
 
-<!-- State how the grades above combine into accept or reject, and how
-unclear is treated. Example shape (write your own): "accept if every
-required check passes; preferred checks never change the verdict, they
-rank accepted issues; unclear counts as fail." -->
+Accept only if every check above passes. If a check fails, reject. If a
+check is unclear, treat it as a fail. It is better to skip an issue you
+can't verify than take one blind.
+
+No "preferred" checks yet. Can add some later (like a good-first-issue
+label) to help rank between accepted issues, but they'd never change
+accept/reject.
