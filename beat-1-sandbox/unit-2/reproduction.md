@@ -33,43 +33,44 @@ opening a PR.
 https://github.com/codepath/pathreview-ai301-fa26-s3/issues/12#issuecomment-5900293660
 
 ```
-Environment: macOS (Darwin 24.6.0, arm64), Python 3.14.5, pytest 9.1.1, installed
-via `pip install -e ".[dev]"` into a fresh venv from a clean clone of my fork at
-commit 2f4e82f. No Docker services needed for this test. The project's tooling
-config targets Python 3.11 specifically; I'm on a newer minor version, but
-nothing in this test touches version-specific behavior.
+## Environment
 
-Steps:
+macOS (Darwin 24.6.0, arm64), Python 3.14.5, pytest 9.1.1, installed via `pip install -e ".[dev]"` into a fresh venv from a clean clone of my fork at commit `2f4e82f`. No Docker services needed for this test. The project's tooling config targets Python 3.11 specifically; I'm on a newer minor version, but nothing in this test touches version-specific behavior.
+
+## Steps
+
 1. Forked and cloned the repo, created a venv, ran `pip install -e ".[dev]"`.
 2. Baseline: `pytest tests/unit/test_prompt_templates.py -q`
-3. Edited `rag/generator/prompt_templates.py`, adding one line to the
-   `skills_feedback` `v1` template's content without touching its version key:
+3. Edited `rag/generator/prompt_templates.py`, adding one line to the `skills_feedback` `v1` template's content without touching its version key:
 
+```diff
  - tool_proficiency: list of tools used effectively
 +- growth_trajectory: brief note on skill growth over time
  """},
+```
 
 4. Re-ran the same test command with no other changes.
 
-Baseline output:
+## Baseline output
+
+```
 .....................................                                    [100%]
 37 passed in 1.05s
+```
 
-After the content change (no version bump):
+## After the content change (no version bump)
+
+```
 .....................................                                    [100%]
 37 passed in 0.17s
+```
 
-This confirms the issue: the suite does not fail when a template's content
-changes without a version bump. Reading `test_template_snapshot_content_hash`
-shows why: it computes a real MD5 hash of all template content, but only
-asserts `isinstance(content_hash, str)` and `len(content_hash) == 32`. Both
-are true for any MD5 hash of any input, so this test can never fail
-regardless of what the templates contain. It hashes the content but never
-compares that hash against a stored expected value.
+## Result
 
-Expected (per the issue): a snapshot test that fails when template content
-changes without a version bump.
-Actual: template content changed, version left at v1, all 37 tests still pass.
+This confirms the issue: the suite does not fail when a template's content changes without a version bump. Reading `test_template_snapshot_content_hash` shows why: it computes a real MD5 hash of all template content, but only asserts `isinstance(content_hash, str)` and `len(content_hash) == 32`. Both are true for any MD5 hash of any input, so this test can never fail regardless of what the templates contain. It hashes the content but never compares that hash against a stored expected value.
+
+**Expected** (per the issue): a snapshot test that fails when template content changes without a version bump.
+**Actual**: template content changed, version left at v1, all 37 tests still pass.
 ```
 
 ## Eval iterations
