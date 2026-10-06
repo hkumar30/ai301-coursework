@@ -104,3 +104,28 @@ Seeing the test fail still doesn't force a developer to bump the version instead
 updating the stored hash at the same key; either response makes the test pass again.
 That limitation is smaller than my first draft's, which couldn't even detect a new
 untracked version.
+
+## Deviations
+ 
+The build matched the plan's design exactly: the same `EXPECTED_TEMPLATE_HASHES`
+dict, keyed and valued identically, and the same per-(name, version) check replacing
+`test_template_snapshot_content_hash`'s body. Two small differences from the literal
+plan, neither changing the design:
+ 
+`make check` ran `black`, which reformatted the file to add one blank line before the
+dict (its convention for the blank lines preceding a class definition). The
+assertions, dict, and docstring are byte-identical to the plan; only whitespace
+changed.
+ 
+The plan's "Before opening a PR" step assumed `make check` would pass cleanly. It
+didn't: `mypy` failed on a pre-existing error in numpy's bundled type stubs ("Type
+statement is only supported in Python 3.12 and greater"), unrelated to this change. I
+confirmed this by stashing the diff and re-running `make check` against unmodified
+`main`, where the identical error appears. Per `docs/CONTRIBUTING.md`'s guidance on
+CI failures unconnected to a diff, I'm recording it here rather than treating it as
+blocking.
+ 
+No change to the diagnosis, scope, or test plan was needed; the only departures were
+a formatting pass and a pre-existing environment issue surfaced while following the
+plan's own pre-PR check.
+ 
