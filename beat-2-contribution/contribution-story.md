@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: Replace `standalone` config option flag with new option to specify visa backend
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -7,12 +7,11 @@ the repository is not read. **Keep every section header below under its exact na
 format criteria grade exactly that. Your course repo link is the whole submission: no tool
 files and no evidence uploads are part of Assignment 5.
 
-**Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
-**Pull Request:** [GitHub PR link, once opened]
+**Contribution Number:** 1
+**Student:** Harsh Kumar
+**GitHub Username:** hkumar30
+**Issue:** https://github.com/tektronix/tm_devices/issues/417
+**Pull Request:** https://github.com/tektronix/tm_devices/pull/649
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -55,10 +54,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Built issue-scout and patched its rubric after it accepted everything**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I grew my Unit 1 skill into issue-scout, with a Python-only fit profile, three `gh search issues` queries, ranking filters and a six-check rubric. Scan 1 accepted all five issues, but four sat in repos with 23 or fewer stars and most were opened the day before, so I added date-bounded queries and a required 50-star "Repo in use" check; scan 2 then rejected all five, each for a checkable reason such as an open PR or a claim comment. Screening the Issue Selection site with `gh` showed my AI-policy check would have passed beets, whose policy bars AI on good first issues and whose maintainer had closed earlier PRs on two of them for that reason, so I tightened it. Across two grading runs on picks from the Issue Selection site, the scout accepted tm_devices #417 and pytorch #74602 and rejected pytorch #119856 and airflow #63374 on scope, though the AI-policy patch has only been checked by reading policy text, not by a scout run that failed on it.
 
 **Unit 6: [one line on the tool work]**
 
@@ -80,24 +78,16 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+I started with my scout's own scans of GitHub. The first one accepted all five issues, mostly in new repos with almost no stars; after I fixed the queries and added a star floor, the second rejected all five, each for a real reason such as an open PR or a claim. My actual pick had to come from the Issue Selection site, so I screened its Python + good-first-issue list (1,203 issues) with `gh`, cutting dead repos and anything already assigned, claimed or linked to an open PR, then graded my best picks with the scout. It accepted tm_devices #417 in both grading runs. I also considered pytorch #74602, which the scout accepted too, but no maintainer had confirmed it was a bug rather than intended behavior, and llm4s #1529, which I never got graded because that run hit my spend limit. I chose #417 because it is Python, so I can focus on the contribution instead of a new toolchain. The maintainer had also already settled the design: deprecate `standalone` with a `DeprecationWarning` now and remove it in v4.0. And nfelt14 answered my question within two hours and assigned the issue to me five days later. An earlier PR for it (#633) had been closed by its author without being merged and a stale WIP label was still on the issue, so I asked whether it was open before claiming. My claim comment: https://github.com/tektronix/tm_devices/issues/417#issuecomment-6330861761. I want to learn a real maintainer review workflow (CLA, changelog, conventional commits, CI), how to change a public config API without breaking existing users, and how to test inside a mature codebase with tox, pre-commit and coverage gates.
+
+My read on the scout is mixed. It caught things I would have missed or gotten wrong: open PRs and claims hidden in comment threads, beets' policy against AI on good first issues (after I patched the AI-policy check), and an Airflow bug that a commenter said no longer reproduces. But on a real search it could not narrow the field by itself. Its queries surfaced brand-new, near-empty repos until I changed them. Each scan grades only the top five, by design, to keep cost down, so I screened the site by hand with `gh` to choose what was worth grading. Even then, my hand screening missed claims worded like "I'd like to have a go," so the scout's own read of the thread is the real check. The WIP label on #417 was a judgment call the rubric could not make, so I settled it by asking the maintainer. Next time I would add a preferred check for maintainer activity on good first issues, and I would grade picks from the site directly instead of relying on scans.
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout (my search strategy and rubric), run as `issue-scout: run a scan` twice and `issue-scout: grade <urls>` twice, plus my own `gh` screening of the Issue Selection site to choose what to grade
+- What it produced: two scans (5 accepted, then 0 accepted after fixes) and two grading runs; tm_devices #417 was accepted both times, with notes about the stale WIP label, the closed PR #633, and the CLA requirement
+- Difficulties: scans surfaced low-quality new repos, grading cost limited how many issues I could check, ranking could not see claims or open PRs, my hand screening missed some claim wordings, and one grading run (llm4s #1529) never ran because I hit my spend limit
+- What changed: date-bounded queries, a required 50-star "Repo in use" check, a stricter scope check for design questions left open in the issue body, and an AI-policy check that also fails policies barring AI on beginner issues; I would also add a preferred check for maintainer activity on good first issues
 
 ---
 
