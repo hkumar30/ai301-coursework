@@ -99,26 +99,26 @@ The scope patch changed how the scout treats an open edge in an issue. The old s
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+The `standalone` option doesn't say what it does. It only picks the PyVISA-py backend, and a config has no way to name any other VISA library. The issue asks for a new option that takes any VISA backend string, in place of `standalone`.
 
 **Expected Behavior**
 
-[What should happen?]
+A `visa_library` option takes any string PyVISA accepts, such as `"@py"`, `"@ivi"` or the path to a library file. `standalone` keeps working but raises a `DeprecationWarning`, and it is removed in v4.0, as nfelt14 described in the issue.
 
 **Current Behavior**
 
-[What actually happens?]
+On `upstream/main`, `DMConfigOptions` rejects `visa_library` with a `TypeError`, and `TM_OPTIONS=VISA_LIBRARY=@py` raises a `KeyError`. `standalone=True` is accepted with no warning. The exact output is under Reproduction Evidence.
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+`DMConfigOptions` in `helpers/constants_and_dataclasses.py`, `DeviceManager.__set_options` and the `visa_library` setter in `device_manager.py`, `DMConfigParser.add_device` in `components/dm_config_parser.py`, the PyVISA-py error text in `helpers/functions.py` and `device_manager.py`, the JSON schema (`tm_devices_config_schema.json`), `docs/configuration.md`, and the tests.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code, which I asked to explain the issue and how the config and VISA-library code in tm_devices fits together
+- What it produced: explanations of what the issue asks for and where `standalone` is handled, plus the lines to read
+- Difficulties: the issue is two sentences and names no files, so I checked each pointer against the code and nfelt14's comment myself
+- What changed: I used the closed PR #633, which nfelt14 pointed me to, as a reference and wrote my own implementation
 
 ---
 
@@ -222,29 +222,37 @@ Two things on `main` itself are broken locally: `tests/test_afgs.py::test_afg3k`
 
 **Analysis**
 
-[Your analysis of the root cause: what is causing the issue, traced
-to the files and functions involved.]
+`standalone` is a boolean field on `DMConfigOptions` (`helpers/constants_and_dataclasses.py`). `DeviceManager.__set_options` (`device_manager.py`) turns it into the `"@py"` backend string and nothing else, and the `DeviceManager.visa_library` setter stores `standalone = (value == "@py")`, so any other library is lost when a config is saved. `DMConfigParser.add_device` (`components/dm_config_parser.py`) reads `standalone` to reject USB and GPIB connections under PyVISA-py. The error text in `helpers/functions.py` and `device_manager.py` tells users to set `STANDALONE`, and nothing warns when it is set.
 
 **Proposed Solution**
 
-[High-level description of your fix approach, and what you are
-deliberately NOT changing.]
+Add `visa_library: Optional[str]` as the last `DMConfigOptions` field and read it first in `__set_options`, so the order is `visa_library`, then `standalone`, then the `TM_DEVICES_VISA_LIBRARY` environment variable and the default. Warn with a `DeprecationWarning` from `DMConfigOptions.__post_init__` whenever `standalone` is not None. Make the setter write `visa_library` and clear `standalone`, so users who never set `standalone` don't get the warning. Make the USB and GPIB check cover both options. I am not removing `standalone`, which waits for v4.0, and I am not adding logging for the deprecation, only `warnings.warn`. The files in `tests/samples/` keep `standalone: true` on purpose, to test the deprecated path.
 
 **Implementation Plan**
 
-1. [Modify file X to do Y]
-2. [Add or change Z]
-3. [Update tests]
+I wrote this plan after building the fix, from the diff and my notes, so the plan and the code agree. The deviations below are where the build differs from what I first planned or told the maintainer.
 
-[Record deviations here as they happen: what changed mid-build and
-why. A recorded deviation is honest work; silent drift is not.]
+1. Add the `visa_library` field to `DMConfigOptions`, mark `standalone` as deprecated in its description and docstring, and add the field to `tm_devices_config_schema.json`.
+2. Warn in `DMConfigOptions.__post_init__` when `standalone` is not None.
+3. Change `DeviceManager.__set_options` to check `visa_library` first, with a TODO to remove the `standalone` branch in v4.0, and change the `visa_library` setter.
+4. Change `DMConfigParser.add_device` so the USB and GPIB rejection applies to `visa_library == "@py"` or to `standalone` when `visa_library` is unset.
+5. Point the PyVISA-py warning in `helpers/functions.py` and the `get_available_devices()` error in `device_manager.py` at `visa_library`, using `PYVISA_PY_BACKEND`.
+6. Add tests in `tests/test_config_parser.py` and `tests/test_device_manager.py`, and update `tests/validate_device_manager_delete.py`.
+7. Update `docs/configuration.md`, the `adding_devices_with_env_var.py` example and the CHANGELOG.
+
+Deviations:
+
+- On 2026-10-27 I told nfelt14 the warning would go in `DeviceManager` where `standalone` is read, not in `__post_init__`. They did not answer that question. I put it in `__post_init__` so that `standalone: false` warns too.
+- The first commit placed `visa_library` right after `standalone`. Commit `b0a552a` moved it to the end of the dataclass to keep positional arguments stable, after the griffe breaking-change check.
+- Review on 2026-11-04 asked for the `PYVISA_PY_BACKEND` constant instead of a hard-coded `"@py"` (commit `d7984f3`), and for one Added entry in the CHANGELOG instead of Added plus Changed (commit `5e06c15`).
+- I tried a logger call alongside the warning, but it flooded the output and broke a test that checks stdout, so the PR uses `warnings.warn` only and offers the log message in the description.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: plan-check, run once from my clone on `plan.md` and a draft `plan-comment.md`; earlier, Claude Code told me which lines to target
+- What it produced: an accept, with all six checks passing. It also noted that my draft comment pastes no output, leaves out the setter change, and doesn't say the warning moved from `DeviceManager`
+- Difficulties: plan-check is meant to run before the build, so on a plan written from the finished diff, an accept shows the plan matches the code, not that it would have steered the work. Its procedure has no step for a missing repro comment, so it took my quoted results as given and could not re-run them
+- What changed: nothing in the plan, since it passed on the first run, and I left the comment alone because it stays off the issue. I would add live-mode steps to plan-check's procedure for a missing repro comment and for a plan written after the build
 
 ---
 
