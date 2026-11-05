@@ -58,11 +58,9 @@ one in the week it belongs to.
 
 I grew my Unit 1 skill into issue-scout, with a Python-only fit profile, three `gh search issues` queries, ranking filters and a six-check rubric. Scan 1 accepted all five issues, but four sat in repos with 23 or fewer stars and most were opened the day before, so I added date-bounded queries and a required 50-star "Repo in use" check; scan 2 then rejected all five, each for a checkable reason such as an open PR or a claim comment. Screening the Issue Selection site with `gh` showed my AI-policy check would have passed beets, whose policy bars AI on good first issues and whose maintainer had closed earlier PRs on two of them for that reason, so I tightened it. Across two grading runs on picks from the Issue Selection site, the scout accepted tm_devices #417 and pytorch #74602 and rejected pytorch #119856 and airflow #63374 on scope, though the AI-policy patch has only been checked by reading policy text, not by a scout run that failed on it.
 
-**Unit 6: [one line on the tool work]**
+**Unit 6: Installed the voice guard and wrote a repo memory file**
 
-[2-4 sentences: the voice-guard, the repo-memory file. What broke or
-fell short, and what changed because of it. "Nothing broke" counts when
-it is true - say how you know.]
+I merged my three voice guides into one with new upstream rules for claims, questions and pings, installed a hook that checks every comment I post through Claude Code against it, and wrote a 35-line `CLAUDE.local.md` for my tm_devices clone. I did all of it after I had posted my claim and built the PR, so the guard checked neither, and the memory file saved no orientation work on this issue. As a late audit, the guard stopped my posted claim and repro-check rejected it for naming no first step and no report-back day, and I left the thread as it is. Dry runs of a ping and a reply passed, so I changed none of my existing rules.
 
 **Unit 7: [one line on the tool work]**
 
@@ -78,16 +76,22 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-I started with my scout's own scans of GitHub. The first one accepted all five issues, mostly in new repos with almost no stars; after I fixed the queries and added a star floor, the second rejected all five, each for a real reason such as an open PR or a claim. My actual pick had to come from the Issue Selection site, so I screened its Python + good-first-issue list (1,203 issues) with `gh`, cutting dead repos and anything already assigned, claimed or linked to an open PR, then graded my best picks with the scout. It accepted tm_devices #417 in both grading runs. I also considered pytorch #74602, which the scout accepted too, but no maintainer had confirmed it was a bug rather than intended behavior, and llm4s #1529, which I never got graded because that run hit my spend limit. I chose #417 because it is Python, so I can focus on the contribution instead of a new toolchain. The maintainer had also already settled the design: deprecate `standalone` with a `DeprecationWarning` now and remove it in v4.0. And nfelt14 answered my question within two hours and assigned the issue to me five days later. An earlier PR for it (#633) had been closed by its author without being merged and a stale WIP label was still on the issue, so I asked whether it was open before claiming. My claim comment: https://github.com/tektronix/tm_devices/issues/417#issuecomment-6330861761. I want to learn a real maintainer review workflow (CLA, changelog, conventional commits, CI), how to change a public config API without breaking existing users, and how to test inside a mature codebase with tox, pre-commit and coverage gates.
+I started with my scout's own scans of GitHub. The first one accepted all five issues, mostly in new repos with almost no stars; after I fixed the queries and added a star floor, the second rejected all five, each for a checkable reason such as an open PR or a claim. My actual pick had to come from the Issue Selection site, so I screened its Python + good-first-issue list (1,203 issues) with `gh`, cutting dead repos and anything already assigned, claimed or linked to an open PR, then graded my best picks with the scout. It accepted tm_devices #417 in both grading runs. I also considered pytorch #74602, which the scout accepted too, but no maintainer had confirmed it was a bug rather than intended behavior, and llm4s #1529, which I never got graded because that run hit my spend limit.
 
-My read on the scout is mixed. It caught things I would have missed or gotten wrong: open PRs and claims hidden in comment threads, beets' policy against AI on good first issues (after I patched the AI-policy check), and an Airflow bug that a commenter said no longer reproduces. But on a real search it could not narrow the field by itself. Its queries surfaced brand-new, near-empty repos until I changed them. Each scan grades only the top five, by design, to keep cost down, so I screened the site by hand with `gh` to choose what was worth grading. Even then, my hand screening missed claims worded like "I'd like to have a go," so the scout's own read of the thread is the real check. The WIP label on #417 was a judgment call the rubric could not make, so I settled it by asking the maintainer. Next time I would add a preferred check for maintainer activity on good first issues, and I would grade picks from the site directly instead of relying on scans.
+I chose #417 because it is Python, so I can focus on the contribution instead of a new toolchain. The maintainer had also already settled the design: deprecate `standalone` with a `DeprecationWarning` now and remove it in v4.0. nfelt14 answered my question within two hours and assigned the issue to me five days later. An earlier PR for it (#633) had been closed by its author without being merged and a stale WIP label was still on the issue, so I asked whether it was open before claiming. My claim comment: https://github.com/tektronix/tm_devices/issues/417#issuecomment-6330861761.
+
+After I patched the scope check, a regrade accepted pytorch #74602 (moderate) and airflow #63374 (ambitious), and rejected #417 on one check only, "Nobody already on it", because the assignee, the open PR and the claim comment are all mine. A rejected issue gets no difficulty note, so the note for #417 is mine, not the scout's: moderate. The issue is two sentences that name the change but no files, and my PR ended up touching the config options, the device manager, the config parser, tests and docs. I want to learn a real maintainer review workflow (CLA, changelog, conventional commits, CI), how to change a public config API without breaking existing users, and how to test inside a mature codebase with tox, pre-commit and coverage gates.
+
+My read on the scout is mixed. It caught things I would have missed or gotten wrong: open PRs and claims hidden in comment threads, beets' policy against AI on good first issues (after I patched the AI-policy check), and an Airflow bug that a commenter said no longer reproduces. But searching GitHub at large, it could not narrow the field by itself. Its queries surfaced brand-new, near-empty repos until I changed them. Each scan grades only the top five, by design, to keep cost down, so I screened the site by hand with `gh` to choose what was worth grading. Even then, my hand screening missed claims worded like "I'd like to have a go," so the scout's own read of the thread is the real check. The WIP label on #417 was a judgment call the rubric could not make, so I settled it by asking the maintainer. Next time I would add a preferred check for maintainer activity on good first issues, and I would grade picks from the site directly instead of relying on scans.
+
+The scope patch changed how the scout treats an open edge in an issue. The old scope check rejected the issue. The new `scope-feasible` check rejects only an issue that is not one piece of work, and anything else gets a difficulty note. The old check was also what had rejected airflow #63374, for two closed PRs and a comment saying the bug no longer reproduces. The new check alone would have accepted it with no warning, so I moved those two signals into the "ambitious" note, and the regrade accepted airflow with that note. I have not rerun my unit 1 gold-label check on the patched rubric, so I can't say its agreement with the labels held.
 
 **Toolkit**
 
-- Tool: issue-scout (my search strategy and rubric), run as `issue-scout: run a scan` twice and `issue-scout: grade <urls>` twice, plus my own `gh` screening of the Issue Selection site to choose what to grade
-- What it produced: two scans (5 accepted, then 0 accepted after fixes) and two grading runs; tm_devices #417 was accepted both times, with notes about the stale WIP label, the closed PR #633, and the CLA requirement
-- Difficulties: scans surfaced low-quality new repos, grading cost limited how many issues I could check, ranking could not see claims or open PRs, my hand screening missed some claim wordings, and one grading run (llm4s #1529) never ran because I hit my spend limit
-- What changed: date-bounded queries, a required 50-star "Repo in use" check, a stricter scope check for design questions left open in the issue body, and an AI-policy check that also fails policies barring AI on beginner issues; I would also add a preferred check for maintainer activity on good first issues
+- Tool: issue-scout (my search strategy and rubric), run as `issue-scout: run a scan` twice and `issue-scout: grade <urls>` three times, the third after the scope patch, plus my own `gh` screening of the Issue Selection site to choose what to grade
+- What it produced: two scans (5 accepted, then 0 accepted after fixes) and three grading runs; tm_devices #417 was accepted in the first two, with notes about the stale WIP label, the closed PR #633, and the CLA requirement. The regrade gave pytorch #74602 and airflow #63374 difficulty notes and rejected #417 only because I now hold it
+- Difficulties: scans surfaced low-quality new repos, grading cost limited how many issues I could check, ranking could not see claims or open PRs, my hand screening missed some claim wordings, and one grading run (llm4s #1529) never ran because I hit my spend limit. The regrade took three tries: a non-interactive `claude -p` run was denied reads of the skill folder, a retry with a narrow tool allowlist left two AI-policy checks unclear, and I ran the third interactively. The rubric also has no exemption for my own claim, and a rejected issue gets no difficulty note
+- What changed: date-bounded queries, a required 50-star "Repo in use" check, and an AI-policy check that also fails policies barring AI on beginner issues. In unit 6 I replaced the scope check with `scope-feasible` plus a difficulty note, which undid the stricter design-question rule I had added in unit 5. I left the self-claim gap unpatched because one example is thin evidence, and I would still add a preferred check for maintainer activity on good first issues
 
 ---
 
@@ -122,31 +126,95 @@ My read on the scout is mixed. It caught things I would have missed or gotten wr
 
 **Environment Setup**
 
-[What a stranger would need to stand this up: your operating system,
-the relevant versions (language, runtime, package manager, the project
-itself), and how you set the project up. Then the challenges you faced
-and how you solved them, or that none came up.]
+macOS 15.7.7, Python 3.14.5, pip 26.2.2, PyVISA 1.16.2, tm_devices 3.7.0 at `upstream/main` commit `9e565e7` (2026-10-19). Dependencies come from the Poetry `.venv` I already had in my clone.
+
+I did not run this from my PR branch. I used a scratch export of `upstream/main` (step 1 below) with its `src` first on `PYTHONPATH`, so my changes can't leak in. The script prints `tm_devices.__file__` to show which copy loaded, and it pointed into the scratch export.
+
+Two things on `main` itself are broken locally: `tests/test_afgs.py::test_afg3k` fails, and `tests/test_docs.py` hangs in `mkdocs build`. Neither touches this issue, so I run the suite with `--ignore=tests/test_docs.py` and expect that one failure.
 
 **Steps to Reproduce**
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. Export the base commit: `git archive 9e565e7 | tar -x -C <scratch>/repro-main`.
+2. Save this as `repro.py` in that folder. It makes the four calls and records any warnings:
+
+   ```python
+   import dataclasses
+   import os
+   import warnings
+   from unittest import mock
+
+   import tm_devices
+   from tm_devices.components.dm_config_parser import DMConfigParser
+   from tm_devices.helpers.constants_and_dataclasses import DMConfigOptions
+
+   print("loaded from:", tm_devices.__file__)
+   print("option fields:", [f.name for f in dataclasses.fields(DMConfigOptions)])
+
+   print("\n[1] DMConfigOptions(visa_library='@py')")
+   try:
+       DMConfigOptions(visa_library="@py")
+   except Exception as e:
+       print("  ->", type(e).__name__, e)
+
+   print("\n[2] DMConfigOptions(standalone=True), all warnings recorded")
+   with warnings.catch_warnings(record=True) as w:
+       warnings.simplefilter("always")
+       opts = DMConfigOptions(standalone=True)
+   print("  warnings raised:", [f"{x.category.__name__}: {x.message}" for x in w])
+   print("  standalone =", opts.standalone)
+
+   print("\n[3] TM_OPTIONS=VISA_LIBRARY=@py through DMConfigParser")
+   with mock.patch.dict(os.environ, {"TM_OPTIONS": "VISA_LIBRARY=@py"}, clear=True):
+       try:
+           DMConfigParser()
+       except Exception as e:
+           print("  ->", type(e).__name__, str(e)[:300])
+
+   print("\n[4] TM_OPTIONS=STANDALONE through DMConfigParser, all warnings recorded")
+   with mock.patch.dict(os.environ, {"TM_OPTIONS": "STANDALONE"}, clear=True):
+       with warnings.catch_warnings(record=True) as w:
+           warnings.simplefilter("always")
+           cfg = DMConfigParser()
+   print("  warnings raised:", [f"{x.category.__name__}: {x.message}" for x in w])
+   print("  options.standalone =", cfg.options.standalone)
+   ```
+
+3. From that folder, run it with a Python that has the project's dependencies: `PYTHONPATH=src python repro.py`. I used my clone's `.venv` and only ran it there.
+4. Observed: calls 1 and 3 reject a `visa_library` option, and calls 2 and 4 accept `standalone` with no warning at all.
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** [link to commit in your fork]
-- **Screenshots/logs:** [if applicable]
-- **My findings:** [what you discovered during reproduction; an
-  honest, evidenced cannot-reproduce that led you to re-pick or ask
-  the maintainer belongs here and costs you nothing]
+- **Commit showing reproduction:** none. I ran it against `upstream/main` in a scratch export, not in a commit.
+- **Screenshots/logs:**
+
+  ```text
+  loaded from: <scratch>/repro-main/src/tm_devices/__init__.py
+  option fields: ['standalone', 'setup_cleanup', 'teardown_cleanup', 'verbose_mode', ...]
+
+  [1] DMConfigOptions(visa_library='@py')
+    -> TypeError DMConfigOptions.__init__() got an unexpected keyword argument 'visa_library'
+
+  [2] DMConfigOptions(standalone=True), all warnings recorded
+    warnings raised: []
+
+  [3] TM_OPTIONS=VISA_LIBRARY=@py through DMConfigParser
+    -> KeyError "Invalid configuration options found: ['VISA_LIBRARY']"
+
+  [4] TM_OPTIONS=STANDALONE through DMConfigParser, all warnings recorded
+    warnings raised: []
+    options.standalone = True
+  ```
+
+- **My findings:** the gap is real on `main` today. There is no option that names a VISA library, and `standalone` can be set without any `DeprecationWarning`, so there is no deprecation path yet. Reading the code, not running it: `device_manager.py:1592` turns `standalone` into the `"@py"` backend and nothing else, and the `DeviceManager.visa_library` setter at line 301 stores `standalone = (value == "@py")`, so a saved config can't record any other library. `docs/configuration.md` describes `standalone` only as "use the PyVISA-py VISA backend".
+
+  This is a feature request, so I showed the missing behavior at the config layer only. I did not test against a real instrument or a non-`@py` VISA library. I also ran this after I had built the fix, so it is a retrospective reproduction, not the first step of the work.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: repro-check, run twice on `claim-draft.md` (my posted claim, copied unchanged) and `repro-draft.md`; the reproduction itself ran in a `git archive` export of `upstream/main`
+- What it produced: the first run failed "Steps are followable" because `repro.py` was not in the report, and left the conventions check unclear because it could not find `CONTRIBUTING.md`. After I put the full script in the report and gave the grader the file's local path, the second run passed the environment, steps, behavior and conventions checks. It still rejected the package on "Outcome stated honestly", because my claim names no first step
+- Difficulties: the claim cannot pass, since it was posted before I wrote the claim rule it breaks, and I did not rewrite it to get a pass. repro-check is built for bug reports, so for a feature request I treated "reproduce" as showing the missing behavior. Run non-interactively, the grader could not read files until I gave it a read allowlist
+- What changed: the full script is now in the report. I posted nothing on the issue, and I did not send the follow-up comment repro-check suggested
 
 ---
 
