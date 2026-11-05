@@ -258,39 +258,53 @@ Deviations:
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+Two checks prove the fix. The first is my reproduction steps, rerun on the branch against the `upstream/main` output. Before the fix, `visa_library` raised a `TypeError` and a `KeyError`, and `standalone` raised no warning. On `5e06c15`, `visa_library="@py"` is accepted from both the constructor and `TM_OPTIONS`, and `standalone` raises a `DeprecationWarning` that mentions `visa_library`. The new tests (11 cases) pass with the fix and all fail against the `upstream/main` source.
+
+The second is the repo's own checks, from my manifest. 872 tests and 8 doctests pass, ruff, pylint and pyright are clean, and griffe reports no breaking change. Three failures are not caused by the change: `test_afg3k` also fails on `upstream/main`, local coverage is 98.55% with only AFG files below 100%, and `tests/test_docs.py` had not finished after 150 seconds. One finding I did not fix: `TM_OPTIONS=STANDALONE` raises the warning twice. All of this ran in scratch copies of the branch, and the output is in `test_evidence.md`, which stays on my computer.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code, which reran my reproduction and the manifest checks in scratch copies of my branch; I had already run the suite myself while building
+- What it produced: the before and after output, the check results, a run showing the new tests fail without the fix, and `test_evidence.md`
+- Difficulties: my first pyright run reported 1,311 errors because pyright does not find `.venv` from a fresh terminal. The reproduction also showed the warning fires twice for `TM_OPTIONS=STANDALONE`, and local coverage cannot reach the project's 100%
+- What changed: the manifest's pyright command now passes `--pythonpath .venv/bin/python`, and the three known failures sit in its second table. I left the double warning alone, since the plan did not cover it
 
 ---
 
 ## Implementation Notes
 
-[A running log, added to as you work. Date each entry. What you
-built, decisions you made when you made them, wrong turns included.]
+All times are UTC, the way GitHub shows them. My commits carry +05:30, which moves the last four to the next day on my clock. I rebuilt this log from `git log` and the PR timeline after the fact, so the two hurdles that git doesn't record are placed by the commits around them.
 
-**[Date]**
+**2026-10-22**
 
-[Entry]
+I asked nfelt14 whether #417 was open, since #633 was closed and the WIP label was still on. They said it looked open now, and I asked to be assigned.
 
-**[Date]**
+**2026-10-27**
 
-[Entry]
+I was assigned and asked nfelt14 two design questions: should the `DeviceManager.visa_library` setter write `options.visa_library`, and should the warning live in `DeviceManager` or `DMConfigOptions.__post_init__`. They answered neither directly, and pointed me to #633, which they said had the feature basically finished. I decided to use it as a reference and write my own version.
+
+**2026-11-03**
+
+First commit, `d650c92`: the `visa_library` field on `DMConfigOptions`, the `DeprecationWarning` for `standalone`, and the JSON schema entry. I put the field right after `standalone`.
+
+**2026-11-04 (01:29 to 09:21)**
+
+Three commits. `3085e1a` makes `DeviceManager.__set_options` read `visa_library` first and changes the setter to write `visa_library` and clear `standalone`. `893b785` makes the USB and GPIB check in `DMConfigParser.add_device` cover both options. `87f197f` adds the tests across three files. Somewhere between the first commit and the tests, I tried a logger call next to the warning. It flooded the output and broke a test that checks stdout, so I dropped it and kept `warnings.warn`. I did not write down the day.
+
+**2026-11-04 (20:35 to 20:44)**
+
+`b0a552a` moved `visa_library` to the end of the dataclass. Placed in the middle, it shifts every option after it. A griffe run on `d650c92`, done later, reports "Positional parameter was moved" for each of them. `3a2637c` added the docs, the example, the CHANGELOG entries and the updated error text. While writing the docs, mdformat rewrote YAML quotes from `""` to `''`, so I added the file again and recommitted. I did not note the day of that either.
+
+**2026-11-04 (21:11 to 22:52)**
+
+I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a hard-coded `"@py"`, and for one Added entry in the CHANGELOG instead of Added plus Changed. I did the first in `d7984f3` at 22:28 and the second in `5e06c15` at 22:51, and replied to each. nfelt14 approved after `d7984f3`, and my push of `5e06c15` dismissed that approval as stale.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code, which rebuilt this log from `git log`, the PR timeline read with `gh`, and my notes
+- What it produced: the dated entries above, with commit times converted to UTC, and a griffe run on my first commit that confirmed why I moved the field
+- Difficulties: I did not keep a log while building, so the days of two hurdles are inferred from nearby commits, and my commit times and GitHub's differ by a day for the last four commits
+- What changed: all dates are UTC and the log says it was rebuilt afterwards. Next time I would write an entry as each commit lands
 
 ---
 
