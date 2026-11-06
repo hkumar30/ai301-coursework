@@ -299,7 +299,7 @@ I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a h
 
 **2026-11-05**
 
-03:39: the ship-gate hook test stopped `gh pr create --help` with a setup BLOCK, which is the expected result with no PR text. 05:45: the CLA bot confirmed I had signed. 17:24: nfelt14 approved again, and the CI workflows ran: most passed, but `test-docs` failed on a `ValueError` parsing a version string and `test-fast (macos)` failed on `test_ping_address`, neither in code I touched. 21:50: a manual ship-gate run on `5e06c15` returned PASS.
+03:39: the ship-gate hook test stopped `gh pr create --help` with a setup BLOCK, which is the expected result with no PR text. 05:45: the CLA bot confirmed I had signed. 17:24: nfelt14 approved again, and the CI workflows ran: most passed, but `test-docs` failed when `nodeenv` could not parse a Node.js version, and `test-fast (macos)` failed on `test_ping_address`, neither in code I touched. 21:50: a manual ship-gate run on `5e06c15` returned PASS.
 
 **2026-11-06**
 
@@ -324,15 +324,15 @@ I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a h
 
 - 2026-11-04: nfelt14 asked for `PYVISA_PY_BACKEND` instead of a hard-coded `"@py"`, and for one Added CHANGELOG entry instead of Added plus Changed.
 - 2026-11-04: I did the first in `d7984f3` and the second in `5e06c15`, and replied on each review thread. nfelt14 approved after `d7984f3`; pushing `5e06c15` dismissed that approval as stale.
-- 2026-11-05: the CLA bot confirmed all committers had signed. nfelt14 re-approved at 17:24 UTC. The first-time-contributor workflows had been approved by then and mostly passed; `test-docs` and `test-fast (macos)` still fail, for reasons outside this change (`ValueError` on a docs version string, and `test_ping_address`).
+- 2026-11-05: the CLA bot confirmed all committers had signed. nfelt14 re-approved at 17:24 UTC. The first-time-contributor workflows had been approved by then and mostly passed; `test-docs` and `test-fast (macos)` still fail, for reasons outside this change: `nodeenv` could not parse a Node.js version (`'0-alpha'`), and `test_ping_address` expected `ttl=` in the macOS runner's `ping` output.
 
-**Status:** Awaiting review
+**Status:** Awaiting review (approved on 2026-11-05, not merged yet)
 
 **Toolkit**
 
 - Tool: ship-gate (`check_gate.py` plus the Claude Code hook), run once as the `gh pr create --help` hook test and once by hand on head `5e06c15` with `pr_draft.md`
 - What it produced: a setup BLOCK on the hook test (no PR text to check), then PASS on the manual run. The three manifest checks were clean, and pr-precheck passed Fidelity, Tested, Reviewable, Standards and Honesty against `plan.md`, `test_evidence.md` and the draft
-- Difficulties: I opened the PR by hand on 2026-11-04, a day before the gate existed, so the PASS audited an open PR and never gated the create. The first pyright run reported 1,311 errors because a fresh terminal does not find `.venv`
+- Difficulties: I opened the PR by hand on 2026-11-04, a day before the gate existed, so the PASS audited an open PR and never gated the create. Each run spends about four minutes on the manifest checks before pr-precheck starts, and pr-precheck uses course credit
 - What changed: the lint row in `ship-manifest.md` now passes `--pythonpath .venv/bin/python`, and the known-failures table holds `test_afg3k`, the local coverage shortfall and the unfinished `test_docs` run. I left the PR as it was; the gate did not ask for any further code change
 
 ---
