@@ -318,7 +318,7 @@ I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a h
 
 **PR Link:** https://github.com/tektronix/tm_devices/pull/649
 
-**PR Description:** The description names the `visa_library` option and the `standalone` deprecation, lists the eleven files the diff touches, and says `Addresses #417`. It has a before/after table for the four reproduction calls, the check results (872 tests, 8 doctests, ruff/pylint/pyright/griffe), the three known local failures, and an AI-use paragraph. The Types of changes and Checklist boxes from the repo template are filled in.
+**PR Description:** The description names the `visa_library` option and the `standalone` deprecation and says `Addresses #417`. It explains the precedence when both options are set, the setter change and the test it altered, why `visa_library` is the last field (griffe reports no breaking changes), the updated error text, and why `tests/samples/` keep `standalone: true`. The Types of changes and Checklist boxes from the repo template are filled in. It has no before/after output and no AI-use note: I wrote a fuller `pr_draft.md` with both for the ship-gate after the PR was open, and left the posted description as it was because nfelt14 had already approved it.
 
 **Maintainer Feedback:**
 
@@ -332,7 +332,7 @@ I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a h
 
 - Tool: ship-gate (`check_gate.py` plus the Claude Code hook), run once as the `gh pr create --help` hook test and once by hand on head `5e06c15` with `pr_draft.md`
 - What it produced: a setup BLOCK on the hook test (no PR text to check), then PASS on the manual run. The three manifest checks were clean, and pr-precheck passed Fidelity, Tested, Reviewable, Standards and Honesty against `plan.md`, `test_evidence.md` and the draft
-- Difficulties: I opened the PR by hand on 2026-11-04, a day before the gate existed, so the PASS audited an open PR and never gated the create. Each run spends about four minutes on the manifest checks before pr-precheck starts, and pr-precheck uses course credit
+- Difficulties: I opened the PR by hand on 2026-11-04, a day before the gate existed, so the PASS audited an open PR and never gated the create. pr-precheck graded `pr_draft.md`, not the description actually on the PR, so its Tested and Honesty passes don't cover what maintainers read. Each run spends about four minutes on the manifest checks before pr-precheck starts, and pr-precheck uses course credit
 - What changed: the lint row in `ship-manifest.md` now passes `--pythonpath .venv/bin/python`, and the known-failures table holds `test_afg3k`, the local coverage shortfall and the unfinished `test_docs` run. I left the PR as it was; the gate did not ask for any further code change
 
 ---
