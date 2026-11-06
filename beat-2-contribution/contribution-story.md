@@ -62,10 +62,9 @@ I grew my Unit 1 skill into issue-scout, with a Python-only fit profile, three `
 
 I merged my three voice guides into one with new upstream rules for claims, questions and pings, installed a hook that checks every comment I post through Claude Code against it, and wrote a 35-line `CLAUDE.local.md` for my tm_devices clone. I did all of it after I had posted my claim and built the PR, so the guard checked neither, and the memory file saved no orientation work on this issue. As a late audit, the guard stopped my posted claim and repro-check rejected it for naming no first step and no report-back day, and I left the thread as it is. Dry runs of a ping and a reply passed, so I changed none of my existing rules.
 
-**Unit 7: [one line on the tool work]**
+**Unit 7: Installed ship-gate, wrote a gate manifest, and got PASS on the open PR**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+I installed the ship-gate against my tm_devices clone and filled `ship-manifest.md` with the project's pytest, lint/type and griffe commands, plus a known-failures table for checks that already fail outside this change. The hook test of `gh pr create --help` logged a setup BLOCK on 2026-11-05; a manual run on head `5e06c15` the next day returned PASS. I had opened the PR by hand a day before the gate existed, so the PASS audited an already-open PR rather than gating the create. A fresh-terminal pyright run was the only real fight, and it is what put `--pythonpath` into the lint row.
 
 **Unit 8: [one line on the tool work]**
 
@@ -310,27 +309,24 @@ I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a h
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/tektronix/tm_devices/pull/649
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Description:** The description names the `visa_library` option and the `standalone` deprecation, lists the eleven files the diff touches, and says `Addresses #417`. It has a before/after table for the four reproduction calls, the check results (872 tests, 8 doctests, ruff/pylint/pyright/griffe), the three known local failures, and an AI-use paragraph. The Types of changes and Checklist boxes from the repo template are filled in.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- 2026-11-04: nfelt14 asked for `PYVISA_PY_BACKEND` instead of a hard-coded `"@py"`, and for one Added CHANGELOG entry instead of Added plus Changed.
+- 2026-11-04: I did the first in `d7984f3` and the second in `5e06c15`, and replied on each review thread. nfelt14 approved after `d7984f3`; pushing `5e06c15` dismissed that approval as stale.
+- 2026-11-05: the CLA bot confirmed all committers had signed. nfelt14 re-approved at 17:24 UTC. The first-time-contributor workflows had been approved by then and mostly passed; `test-docs` and `test-fast (macos)` still fail, for reasons outside this change (`ValueError` on a docs version string, and `test_ping_address`).
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Awaiting review
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: ship-gate (`check_gate.py` plus the Claude Code hook), run once as the `gh pr create --help` hook test and once by hand on head `5e06c15` with `pr_draft.md`
+- What it produced: a setup BLOCK on the hook test (no PR text to check), then PASS on the manual run. The three manifest checks were clean, and pr-precheck passed Fidelity, Tested, Reviewable, Standards and Honesty against `plan.md`, `test_evidence.md` and the draft
+- Difficulties: I opened the PR by hand on 2026-11-04, a day before the gate existed, so the PASS audited an open PR and never gated the create. The first pyright run reported 1,311 errors because a fresh terminal does not find `.venv`
+- What changed: the lint row in `ship-manifest.md` now passes `--pythonpath .venv/bin/python`, and the known-failures table holds `test_afg3k`, the local coverage shortfall and the unfinished `test_docs` run. I left the PR as it was; the gate did not ask for any further code change
 
 ---
 
