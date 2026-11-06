@@ -64,12 +64,11 @@ I merged my three voice guides into one with new upstream rules for claims, ques
 
 **Unit 7: Installed ship-gate, wrote a gate manifest, and got PASS on the open PR**
 
-I installed the ship-gate against my tm_devices clone and filled `ship-manifest.md` with the project's pytest, lint/type and griffe commands, plus a known-failures table for checks that already fail outside this change. The hook test of `gh pr create --help` logged a setup BLOCK on 2026-11-05; a manual run on head `5e06c15` the next day returned PASS. I had opened the PR by hand a day before the gate existed, so the PASS audited an already-open PR rather than gating the create. A fresh-terminal pyright run was the only real fight, and it is what put `--pythonpath` into the lint row.
+I installed the ship-gate against my tm_devices clone and filled `ship-manifest.md` with the project's pytest, lint/type and griffe commands, plus a known-failures table for checks that already fail outside this change. The hook test of `gh pr create --help` logged a setup BLOCK on 2026-11-05, and a manual run on head `5e06c15` later that day (21:50 UTC) returned PASS. I had opened the PR by hand a day before the gate existed, so the PASS audited an already-open PR rather than gating the create. A fresh-terminal pyright run was the only real fight, and it is what put `--pythonpath` into the lint row.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: Installed the PR monitor and wrote a playbook, but the drafting run hit my spend limit**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+I installed the monitor and wrote a playbook from five merged outside-contributor PRs, where a maintainer answered within a day each time, so I nudge after 4 quiet working days before a first review and 7 after an approval. `--state` read #649 correctly (approved, 5 failing checks, mergeable but blocked), yet labeled it "review feedback is in" because the newest thread items were CI and Codecov bot comments, so I added a playbook rule that bot comments don't count as activity. The full run stopped before drafting anything because Claude hit my spend limit, so there is no draft to judge and I posted nothing. The PR is approved and has been quiet for under a day, so by my own thresholds no move is due yet.
 
 ---
 
@@ -298,6 +297,14 @@ Three commits. `3085e1a` makes `DeviceManager.__set_options` read `visa_library`
 
 I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a hard-coded `"@py"`, and for one Added entry in the CHANGELOG instead of Added plus Changed. I did the first in `d7984f3` at 22:28 and the second in `5e06c15` at 22:51, and replied to each. nfelt14 approved after `d7984f3`, and my push of `5e06c15` dismissed that approval as stale.
 
+**2026-11-05**
+
+03:39: the ship-gate hook test stopped `gh pr create --help` with a setup BLOCK, which is the expected result with no PR text. 05:45: the CLA bot confirmed I had signed. 17:24: nfelt14 approved again, and the CI workflows ran: most passed, but `test-docs` failed on a `ValueError` parsing a version string and `test-fast (macos)` failed on `test_ping_address`, neither in code I touched. 21:50: a manual ship-gate run on `5e06c15` returned PASS.
+
+**2026-11-06**
+
+01:21: I installed the PR monitor, and `--state` read the PR. After I filled the playbook, the full run at 01:24 stopped on my Claude spend limit, so nothing was drafted.
+
 **Toolkit**
 
 - Tool: Claude Code, which rebuilt this log from `git log`, the PR timeline read with `gh`, and my notes
@@ -334,25 +341,22 @@ I opened PR #649 at 21:11. nfelt14 asked for `PYVISA_PY_BACKEND` in place of a h
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+I learned how to deprecate a public option without breaking anyone: keep the old field, raise a `DeprecationWarning` from the dataclass's `__post_init__`, and give the new option precedence. griffe taught me that adding a dataclass field in the middle is a breaking change, because every later positional argument moves. I also learned to test a warning with `warnings.catch_warnings(record=True)`, to reproduce against a `git archive` export of `upstream/main` so my branch can't leak in, and to run pyright from a fresh terminal with `--pythonpath` pointed at `.venv`.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+My first commit put `visa_library` right after `standalone`, and griffe reported "Positional parameter was moved" for every field after it, so I moved it to the end in `b0a552a`. A logger call next to the warning flooded the output and broke a stdout test, so I kept `warnings.warn` only and offered the log message in the PR instead. mdformat rewrote the YAML quotes in the docs, so I re-added the file and committed again. Pushing the CHANGELOG fix dismissed nfelt14's approval as stale, and a second approval came the next day.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+I built most of my tools after the work they were meant to check. The voice guard came after my claim, the plan after the fix, and the ship-gate after the PR was open, so each one audited instead of steering. Next time I would install the gate and write the plan before the first commit, and keep the Implementation Notes as I go instead of rebuilding them from `git log`. I would also check my Claude spend before a run that needs it, since the limit stopped two of my tool runs.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- [tektronix/tm_devices#417](https://github.com/tektronix/tm_devices/issues/417): nfelt14's comment set the design (deprecate `standalone` now, remove it in v4.0), and nfelt14 answered my questions on the thread.
+- [tektronix/tm_devices#633](https://github.com/tektronix/tm_devices/pull/633): the closed earlier PR nfelt14 pointed me to, which I used as a reference for my own version.
+- [tm_devices CONTRIBUTING.md](https://github.com/tektronix/tm_devices/blob/main/CONTRIBUTING.md): commit signing, the CLA, the changelog entry and the pre-commit and tox commands my manifest is built from.
+- nfelt14's review on [#649](https://github.com/tektronix/tm_devices/pull/649): the `PYVISA_PY_BACKEND` and CHANGELOG comments.
+- [griffe](https://mkdocstrings.github.io/griffe/): the breaking-change check that made me move the new field to the end.
