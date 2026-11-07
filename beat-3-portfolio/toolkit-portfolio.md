@@ -1,118 +1,169 @@
 # Toolkit Portfolio
 
-Path: `beat-3-portfolio/toolkit-portfolio.md`
-
-This file is Assignment 6, and it is graded at the path above; a copy kept anywhere else in
-the repository is not read. It has been waiting here since you created the repo in unit 1;
-unit 9 is when you write it.
-
-**Only this page is read.** Your `tools/` folders and your installed skill folders are never
-opened, so every piece of evidence you want seen has to live inline here: an output excerpt,
-a before/after pair, a dated commit reference.
-
-**Write every sentence yourself.** AI may gather diffs, dates and excerpts for you; it does
-not draft entries.
-
-**Keep every section header below under its exact name** — Featured Tools, Inventory, The
-Arc, and Limitations and What's Next. Feature three or four tools, each in the entry shape
-shown below; give every other tool one inventory line.
-
-**Some lines below are labelled, and the label is how they are read.** Three places on this
-page use a `Label: your words` shape — the arc's beats, the tool-limits list, and nothing
-else. Keep those labels exactly as written, one per line, and never delete a labelled line:
-where you have nothing to put after a label, write `none` and move on. A deleted label reads
-as a deleted answer.
-
-**Before you finish**, replace every `[bracketed prompt]` with your own words, then delete
-the unused `[Tool name]` entry stub, its copy-me sentence, and the prompt sentences under
-each header. A leftover bracketed prompt reads as unfilled.
-
-**Student:** [Student name]
+**Student:** Harsh Kumar
 
 ## Featured Tools
 
-Three or four tools, presented in depth. Open with a few sentences
-on why you chose these.
+Three of them (issue-scout, repro-check, ship-gate) visibly changed through use, and the PR monitor covers the stage after the PR is open.
 
-Full credit asks the featured set to show real change: **at least two** of your featured
-entries should show a tool that visibly moved through use. An honest entry for a tool that
-barely changed — saying so, dating what did happen, and giving the reason — earns the solid
-middle tier and never fails you.
+**issue-scout**
 
-Each tool's honest limit is not written here. It goes in the tool-limits list at the
-bottom of this page, one line per featured tool, so that the limits sit together and can be
-read as a set.
+**What it is, and the judgment hole I wrote:** Searches GitHub with my `gh` queries, ranks the results, and grades the top 5 on my `rubric.md`. For my real pick, Claude scraped the Issue Selection site's list, I screened it with `gh`, and the scout graded the shortlist.
 
-[Why these tools, in your own words.]
+> Repo in use: Pass if the repo has 50 or more stars on the capture date (live mode: today). Fail below 50, or if the count can't be read
 
-Copy the entry shape below once per featured tool and fill it there.
+**How it evolved, dated:**
 
-**[Tool name]**
+- 2026-10-22: I added date-bounded queries and the required 50-star "Repo in use" check. Additionally, I scoped it to issues that are at least 30 days old and were updated in the last 60 days.
+- 2026-10-22: The AI-policy check now also fails a policy that bars AI on beginner issues or limits AI to review.
+- 2026-11-05: I replaced "Scope fits a newcomer" with scope-feasible plus a difficulty note, and airflow#63374 was then accepted as "ambitious".
 
-**What it is, and the judgment hole I wrote:** [what the tool does,
-and the part of it that is your judgment: the rubric, strategy,
-guide, manifest, or playbook you wrote.]
+**Evidence:**
 
-**How it evolved, dated:** [the changes that made it yours, each
-with its date and the friction that drove it; your weekly Toolkit
-entries are the source.]
+```text
+Scan 1 (2026-10-22): the top 5 were graded and ALL 5 were accepted, none rejected.
+Scan 2 (2026-10-22): ALL 5 REJECTED (discriminating now, but 0 yield).
+  open PR #1225 and a claim comment on nutshell#476; open PR #1753 plus two closed
+  ones on django-modern-rest#1493; owner handed aquascope#432 to someone with a
+  draft PR, and the repo has 30 stars against the 50 floor
+```
 
-**Evidence:** [show, don't claim: an output excerpt, a before/after
-pair, or a dated commit reference, inline here. Draw it from your real
-term work where you can - a catch this tool actually made, a
-before/after from your own repo or PR - which is graded separately from
-whether an artifact is present at all. A short, telling excerpt beats a
-pasted transcript.]
+**repro-check**
+
+**What it is, and the judgment hole I wrote:** Grades a claim comment plus a repro report against my `rubric.md` (five required checks).
+
+> Outcome stated honestly: the claim comment promises only investigation, never a fix or a timeline, before the work is done, and the report's conclusion is exactly as strong as its evidence
+
+**How it evolved, dated:**
+
+- 2026-09-30 (`9b46687`): pkg-19 passed despite promising a fix in 2 days. I made "Outcome stated honestly" grade the claim's promises, dropped the `conda list` clause, and removed duplicate rows. Eval went from 17/20 to 20/20.
+- 2026-11-05: On my #417 report, run 1 failed "Steps are followable" because `repro.py` was not in the report. I put the full script in, and run 2 passed it; the package was still rejected on my posted claim.
+
+**Evidence:**
+
+```text
+pkg-19 claim comment: "Kindly assign it to me, I will fix it within 2 days guaranteed"
+First full run:  agreement: 17/20 scored items  (bar: 18/20: below the bar)
+Fourth full run: agreement: 20/20 scored items  (bar: 18/20: PASS)
+```
+
+**ship-gate and ship-manifest.md**
+
+**What it is, and the judgment hole I wrote:** Runs my manifest's repo checks, then pr-precheck, before `gh pr create`. I wrote the must-pass table and a dated known-failures table.
+
+> tests/test_afgs.py::test_afg3k | 2026-11-05 | Fails on upstream/main 9e565e7 too (AssertionError: assert '' == 'PyVISA-...'), in a file my PR does not touch.
+
+**How it evolved, dated:**
+
+- 2026-11-05: pyright run from a fresh terminal found no `.venv` and reported 1,311 errors. I added `--pythonpath .venv/bin/python` to the lint row.
+
+```text
+before: .venv/bin/pyright                                   1,311 errors
+after:  .venv/bin/pyright --pythonpath .venv/bin/python     0 errors
+```
+
+**Evidence:**
+
+```text
+2026-11-06 03:20 IST, tektronix/tm_devices @ feat/visa-library-option
+- verdict: PASS
+- Lint and types: ... .venv/bin/pyright --pythonpath .venv/bin/python -> ok (121s)
+- Public API breaking changes: .venv/bin/griffe check ... -> ok (39s)
+- Honesty [pass]: plan.md Deviations and test_evidence.md plainly name the changed
+  warning location, the double DeprecationWarning, the test_afg3k failure, the
+  coverage shortfall and the unfinished test_docs.
+```
+
+**PR monitor and playbook.md**
+
+**What it is, and the judgment hole I wrote:** Reads my PR's state and drafts my next move. I wrote the four playbook sections from five merged tm_devices PRs (#638, #612, #598, #596, #573), where a maintainer answered within a day each time.
+
+> Approved but not merged, or review stalled after my reply: nudge after 7 working days.
+> Bot comments (CI results, Codecov, CLA, Read the Docs) don't count as activity from either side.
+
+**How it evolved, dated:**
+
+- 2026-11-06: `--state` called bot comments review feedback. I added the playbook rule that bots don't count. The full run then hit my spend limit, so it drafted nothing.
+
+**Evidence:**
+
+```text
+$ monitor.py --state   (PR #649, 2026-11-06)
+- review decision: APPROVED
+- state: FEEDBACK-IN: review feedback is in (latest from the thread: comment under a day ago)
+
+$ monitor.py
+pr-monitor: STOP. the drafting pass could not complete (claude exited 1: You've hit
+your individual spend limit ...). Nothing was drafted and nothing was posted
+```
 
 ## Inventory
 
-One line each for the rest of the toolkit: what it is and where it
-stands (one bullet per tool; a compact sentence or two is fine).
-
-- [Tool name: one line.]
+- issue-select (unit 1, `7abeffb`, eval 18/20): grew into issue-scout in unit 5.
+- plan-check (unit 3, `e18164a`, eval 19/20): accepted my #417 plan 6/6, but on a plan written after the build.
+- pr-precheck (unit 4, `baedb66`, eval 19/20): runs inside the ship-gate; passed 5/5 on PR #649.
+- voice guard and voice-guide.md (unit 6): installed after my claim and PR; on a late audit it stopped my posted claim; no rule changed.
+- CLAUDE.local.md (unit 6): 35 lines for my tm_devices clone, written after the work, so it saved no orientation on #417.
 
 ## The Arc
 
-The story of the toolkit in order: friction, change, result, dated.
-Your weekly Toolkit entries are the source; read your own record and
-tell it oldest first.
-
-Write one block per beat, in the shape below, oldest first. Keep all four labels on every
-beat, each on its own line. The `Result:` line is what the beat was for: it says what
-happened *after* the change, which is not the same sentence as the change itself. If a beat
-never reached a result, write `Result: none` — an honest beat that did not land still counts
-fully as a beat.
-
-Full credit asks for **at least two** beats whose `Result:` line names something that
-actually happened afterwards. A beat about something that did not work counts fully as a
-beat, and when the work happened never moves this score.
-
 **Beat 1**
-Date: [a date, or a month and year]
-Friction: [what was going wrong, and how you noticed]
-Change: [what you changed because of it]
-Result: [what happened afterwards, or the word none]
+Date: 2026-09-30
+Friction: repro-check passed pkg-19, whose claim promised a fix in 2 days.
+Change: "Outcome stated honestly" now grades the claim's promises; duplicate rubric rows removed.
+Result: eval rose from 17/20 to 20/20.
 
 **Beat 2**
-Date: [a date, or a month and year]
-Friction: [what was going wrong, and how you noticed]
-Change: [what you changed because of it]
-Result: [what happened afterwards, or the word none]
+Date: 2026-10-22
+Friction: scan 1 accepted all 5 issues; 4 sat in repos with 23 or fewer stars.
+Change: date-bounded queries and a required 50-star "Repo in use" check.
+Result: scan 2 rejected all 5, each on a named open PR, claim or star count.
 
-Copy the beat shape above for as many beats as your term had.
+**Beat 3**
+Date: 2026-10-22
+Friction: beets' AI policy bars AI on good first issues, and my AI-policy check would have passed it.
+Change: the check now fails policies that bar AI on beginner issues or limit AI to review.
+Result: none
+
+**Beat 4**
+Date: 2026-10-22
+Friction: the scans gave nothing claimable, and the pick had to come from the Issue Selection site.
+Change: screened the site's list with `gh` and graded the shortlist with the scout.
+Result: tm_devices#417 accepted in two grade runs; claimed 2026-10-22, assigned 2026-10-27, PR #649 opened 2026-11-04 and approved 2026-11-05.
+
+**Beat 5**
+Date: 2026-11-05
+Friction: "Scope fits a newcomer" rejected issues just for an open design edge.
+Change: scope-feasible plus a difficulty note.
+Result: grade run 4 accepted airflow#63374 as "ambitious".
+
+**Beat 6**
+Date: 2026-11-05
+Friction: pyright from a fresh terminal reported 1,311 errors.
+Change: `--pythonpath .venv/bin/python` in the manifest's lint row.
+Result: ship-gate PASS on `5e06c15`, 2026-11-06 03:20 IST.
+
+**Beat 7**
+Date: 2026-11-05
+Friction: repro-check failed my #417 report on "Steps are followable"; `repro.py` was missing.
+Change: put the full script in the report.
+Result: run 2 passed the steps check.
+
+**Beat 8**
+Date: 2026-11-06
+Friction: the PR monitor read bot comments on #649 as review feedback.
+Change: playbook rule that bot comments don't count.
+Result: none
 
 ## Limitations and What's Next
 
-What the toolkit as a whole still does not do, and what you would
-build or change next. Write this section last; it will be better
-after the rest.
+My tools ran after the work they check: the voice guard after my claim, the plan after the fix, and the ship-gate after the PR was open. The spend limit stopped two runs, grade run 3 and the monitor's draft.
 
-[The honest limits, and what comes next, in your own sentences.]
+Next: the ship-gate compares `pr_draft.md` with the `gh pr view` body and blocks on a mismatch, and the monitor skips `[bot]` authors before it picks the state.
 
-**Tool limits.** One line per featured tool, in the same order as the entries above, naming
-where that tool still stops or what it still gets wrong. A small honest limit is full credit;
-"none really" is not a limit. If a tool genuinely has none you can name, write `none` after
-its label rather than deleting the line.
+**Tool limits.**
 
-issue-scout: [where this tool still stops, in plain words, or the word none]
-[tool name]: [where this tool still stops, in plain words, or the word none]
+issue-scout: no exemption for my own claim; it rejected #417 after I claimed it.
+repro-check: built for bug reports; for my feature request I had to treat "reproduce" as showing the missing behavior.
+ship-gate: pr-precheck grades `pr_draft.md`, not the PR body actually posted.
+PR monitor: counts bot comments as activity, and it never produced a draft for me.
